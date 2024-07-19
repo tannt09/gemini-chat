@@ -6,6 +6,8 @@ class ChatBubble extends StatelessWidget {
   final String? photoUrl;
   final String? message;
 
+  final double _iconSize = 24;
+
   const ChatBubble(
       {required this.isMine,
       required this.photoUrl,
@@ -17,25 +19,43 @@ class ChatBubble extends StatelessWidget {
     final List<Widget> widgets = [];
 
     // user avatar
-    widgets.add(ClipRRect(
-        borderRadius: BorderRadius.circular(16),
-        child: photoUrl == null
-            ? const _DefaultPersonWidget()
-            : CachedNetworkImage(
-                imageUrl: photoUrl!,
-                errorWidget: (context, url, error) =>
-                    const _DefaultPersonWidget(),
-                placeholder: (context, url) => const _DefaultPersonWidget(),
-              )));
+    widgets.add(Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: ClipRRect(
+          borderRadius: BorderRadius.circular(_iconSize),
+          child: photoUrl == null
+              ? const _DefaultPersonWidget()
+              : CachedNetworkImage(
+                  imageUrl: photoUrl!,
+                  width: _iconSize,
+                  height: _iconSize,
+                  fit: BoxFit.fitWidth,
+                  errorWidget: (context, url, error) =>
+                      const _DefaultPersonWidget(),
+                  placeholder: (context, url) => const _DefaultPersonWidget(),
+                )),
+    ));
 
     // message bubble
     widgets.add(Container(
-      decoration: BoxDecoration(borderRadius: BorderRadius.circular(16.0),
-      color: isMine ? Colors.black26 : Colors.black87),
+      constraints:
+          BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.8),
+      decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16.0),
+          color: isMine ? Colors.black26 : Colors.black87),
       padding: const EdgeInsets.all(8.0),
-      child: Text(message ?? 'Message is null', style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.white),),
+      child: Text(
+        message ?? 'Message is null',
+        style: Theme.of(context)
+            .textTheme
+            .bodyMedium
+            ?.copyWith(color: Colors.white),
+      ),
     ));
     return Row(
+      mainAxisSize: MainAxisSize.max,
+      mainAxisAlignment:
+          isMine ? MainAxisAlignment.end : MainAxisAlignment.start,
       children: isMine ? widgets.reversed.toList() : widgets,
     );
   }
@@ -46,5 +66,5 @@ class _DefaultPersonWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      const Icon(Icons.person, color: Colors.black, size: 12);
+      const Icon(Icons.person, color: Colors.black, size: 20);
 }
