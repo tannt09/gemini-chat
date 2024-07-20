@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:gemini_bloc/widgets/chat_bubble_widget.dart';
 import 'package:gemini_bloc/widgets/message_box_widget.dart';
+import 'package:gemini_bloc/worker/genai_worker.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final GenAIWorker _worker = GenAIWorker();
+  
+  MyApp({super.key});
 
   // This widget is the root of your application.
   @override
@@ -35,7 +37,11 @@ class MyApp extends StatelessWidget {
                 ),
               ],
             )),
-            const MessageBox()
+            MessageBox(
+              onSendMessage: (value) {
+                print('----1111 $value');
+              },
+            )
           ],
         ),
       ),

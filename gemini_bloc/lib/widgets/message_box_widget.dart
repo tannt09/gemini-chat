@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
 class MessageBox extends StatefulWidget {
-  const MessageBox({super.key});
+  final ValueChanged<String> onSendMessage;
+  const MessageBox({required this.onSendMessage, super.key});
 
   @override
   State<MessageBox> createState() => _MessageBoxState();
@@ -24,7 +25,7 @@ class _MessageBoxState extends State<MessageBox> {
           maxLines: 1,
           textAlignVertical: TextAlignVertical.center,
           decoration: InputDecoration(
-            contentPadding: const EdgeInsets.symmetric(horizontal: 12.0),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 12.0),
               border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(16.0),
                   borderSide:
@@ -32,11 +33,13 @@ class _MessageBoxState extends State<MessageBox> {
               suffix: IconButton(
                 icon: const Icon(Icons.send),
                 onPressed: () {
-                  // TODO send message
+                  widget.onSendMessage(_controller.text);
+                  _controller.clear();
                 },
               )),
           onSubmitted: (value) {
-            // TODO send message
+            widget.onSendMessage(value);
+            _controller.clear();
           },
         ),
       );
