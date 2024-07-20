@@ -11,12 +11,24 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: Center(
-        child: ChatBubble(
-          isMine: true,
-          photoUrl: 'https://picsum.photos/seed/picsum/200/300',
-          message: 'this is a message from me',
+    return MaterialApp(
+      home: Scaffold(
+        appBar: AppBar(
+          title: const Text('Gemini Chat'),
+        ),
+        body: const Column(
+          children: [
+            ChatBubble(
+              isMine: false,
+              photoUrl: 'https://picsum.photos/seed/picsum/200/300',
+              message: 'this is a message from me',
+            ),
+            ChatBubble(
+              isMine: true,
+              photoUrl: 'https://picsum.photos/seed/picsum/200/300',
+              message: 'this is a message from me',
+            ),
+          ],
         ),
       ),
     );
