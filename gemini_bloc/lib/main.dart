@@ -8,13 +8,27 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 Future<void> main() async {
   await dotenv.load(fileName: ".env");
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
+
+  const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
   final GenAIWorker _worker = GenAIWorker();
-  
-  MyApp({super.key});
+
+  final ScrollController _controller = ScrollController();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   // This widget is the root of your application.
   @override
@@ -27,23 +41,25 @@ class MyApp extends StatelessWidget {
         body: Column(
           children: [
             Expanded(
-                child: ListView(
-              children: const [
-                ChatBubble(
-                  isMine: false,
-                  photoUrl: 'https://picsum.photos/seed/picsum/200/300',
-                  message: 'this is a message from me',
-                ),
-                ChatBubble(
-                  isMine: true,
-                  photoUrl: 'https://picsum.photos/seed/picsum/200/300',
-                  message: 'this is a message from me',
-                ),
-              ],
-            )),
+                child: StreamBuilder<List<ChatContent>>(
+                    stream: _worker.stream,
+                    builder: (context, snapshot) {
+                      final List<ChatContent> data = snapshot.data ?? [];
+                      return ListView(
+                        controller: _controller,
+                        children: data.map((e) {
+                          final bool isMine = e.sender == Sender.user;
+                          return ChatBubble(
+                              isMine: isMine,
+                              photoUrl:
+                                  'https://picsum.photos/seed/picsum/200/300',
+                              message: e.message);
+                        }).toList(),
+                      );
+                    })),
             MessageBox(
               onSendMessage: (value) {
-                print('----1111 $value');
+                _worker.sendToGemini(value);
               },
             )
           ],
