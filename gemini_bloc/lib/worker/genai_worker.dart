@@ -1,10 +1,11 @@
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 
 class GenAIWorker {
   late final GenerativeModel _model;
 
   GenAIWorker() {
-    const apiKey = String.fromEnvironment('apiKey');
+    String apiKey = dotenv.env['API_KEY'] ?? 'Unknown API URL';
 
     print('----2222 $apiKey');
 
