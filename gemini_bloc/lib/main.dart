@@ -1,18 +1,22 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gemini_bloc/bloc/genai_bloc.dart';
+import 'package:gemini_bloc/data/chat_content.dart';
 import 'package:gemini_bloc/widgets/chat_bubble_widget.dart';
 import 'package:gemini_bloc/widgets/message_box_widget.dart';
-import 'package:gemini_bloc/worker/genai_worker.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 Future<void> main() async {
   await dotenv.load(fileName: ".env");
-  runApp(const MyApp());
+  runApp(BlocProvider<GenaiBloc>(
+    create: (context) => GenaiBloc(),
+    child: const MyApp(),
+  ));
 }
 
 class MyApp extends StatefulWidget {
-
   const MyApp({super.key});
 
   @override
@@ -20,8 +24,6 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  final GenAIWorker _worker = GenAIWorker();
-
   final ScrollController _controller = ScrollController();
 
   @override
@@ -41,10 +43,14 @@ class _MyAppState extends State<MyApp> {
         body: Column(
           children: [
             Expanded(
-                child: StreamBuilder<List<ChatContent>>(
-                    stream: _worker.stream,
-                    builder: (context, snapshot) {
-                      final List<ChatContent> data = snapshot.data ?? [];
+                child: BlocBuilder<GenaiBloc, GenaiState>(
+                    builder: (context, state) {
+                      final List<ChatContent> data = [];
+
+                      if (state is MessagesUpdate) {
+                        data.addAll(state.contents);
+                      }
+                      
                       return ListView(
                         controller: _controller,
                         children: data.map((e) {
@@ -59,7 +65,7 @@ class _MyAppState extends State<MyApp> {
                     })),
             MessageBox(
               onSendMessage: (value) {
-                _worker.sendToGemini(value);
+                context.read<GenaiBloc>().add(SendMessageEvent(value));
               },
             )
           ],
